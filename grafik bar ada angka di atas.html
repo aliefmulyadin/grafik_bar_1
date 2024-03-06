@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar Chart with Labels and Padding</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .bar-label {
+      position: absolute;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container mt-5">
+  <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+  // Data untuk chart
+  var data = {
+    labels: ['Bar 1', 'Bar 2', 'Bar 3', 'Bar 4'],
+    datasets: [{
+      label: 'Value 1',
+      data: [5, 10, 0, 2000],
+      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      borderColor: 'rgba(255, 99, 132, 1)',
+      borderWidth: 1
+    },
+    {
+      label: 'Value 2',
+      data: [8, 15, 5, 25],
+      backgroundColor: 'rgba(54, 162, 235, 0.5)',
+      borderColor: 'rgba(54, 162, 235, 1)',
+      borderWidth: 1
+    }]
+  };
+
+  // Hitung nilai maksimum dari data
+  var maxValue = Math.max.apply(null, data.datasets.flatMap(dataset => dataset.data));
+
+  // Set suggestedMax sebagai 5% dari nilai terbesar
+  var suggestedMaxValue = maxValue * 1.05;
+
+  // Konfigurasi chart
+  var options = {
+    scales: {
+      y: {
+        beginAtZero: true,
+        suggestedMax: suggestedMaxValue
+      }
+    },
+    plugins: {
+      legend: {
+        display: true
+      },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        offset: 4, // Jarak antara label dengan bar
+        display: function(context) {
+          return context.dataset.data[context.dataIndex] !== 0;
+        },
+        formatter: function(value, context) {
+          return value === 0 ? '' : value;
+        },
+        listeners: {
+          click: function(context) {
+            // Mendapatkan indeks elemen yang diklik
+            var index = context.dataIndex;
+
+            // Menentukan halaman yang akan dituju sesuai dengan indeks elemen
+            var targetPage = '/page' + (index + 1);
+
+            // Pindahkan halaman
+            window.location.href = targetPage;
+          }
+        },
+        color: 'black', // Warna teks
+        font: {
+          weight: 'bold'
+        }
+      }
+    },
+    onClick: function(event, elements) {
+      if (elements.length > 0) {
+        var dataIndex = elements[0].index;
+        var datasetIndex = elements[0].datasetIndex;
+        var label = data.labels[dataIndex];
+        var value = data.datasets[datasetIndex].data[dataIndex];
+
+        // Sesuaikan dengan kebutuhan, misalnya membuka URL berdasarkan label dan nilai
+        var url = 'tujuan.html?label=' + label + '&value=' + value;
+        window.open(url, '_blank');
+      }
+    }
+  };
+
+  // Membuat chart
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: options,
+    plugins: [ChartDataLabels]
+  });
+
+</script>
+
+</body>
+</html>
